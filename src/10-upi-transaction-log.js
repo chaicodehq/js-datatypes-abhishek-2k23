@@ -47,5 +47,60 @@
  *   //      frequentContact: "Swiggy", allAbove100: false, hasLargeTransaction: true }
  */
 export function analyzeUPITransactions(transactions) {
-  // Your code here
+  if(!Array.isArray(transactions) || transactions.length === 0){
+    return null;
+  }  
+  let validTransactions = transactions.filter((t) => {
+    if((t.type === "credit" && t.amount > 0)|| (t.type === "debit" && t.amount > 0) ){
+      return t;
+    }
+  })
+  if(validTransactions.length === 0){
+    return null;
+  }
+  let totalCredit = validTransactions.reduce((sum, t) => {
+    if(t.type === "credit"){
+      sum += t.amount;
+    }
+    return sum;
+  }, 0 );
+  let totalDebit = validTransactions.reduce((sum, t) => {
+    if(t.type === "debit"){
+      sum += t.amount;
+    }
+    return sum;
+  }, 0 );
+  let netBalance = totalCredit - totalDebit;
+  let transactionCount = validTransactions.length;
+  let avgTransactions = Math.round((totalCredit + totalDebit) / transactionCount);
+  let highestTransaction = validTransactions.sort((a,b) => b.amount - a.amount)[0];
+  let categoryTransaction = validTransactions.reduce((ct, {amount, category}) => {
+    if(ct.hasOwnProperty(category)){
+      ct[category] += amount;
+    }else{
+      ct[category] = amount;
+    }
+
+    return ct;
+  }, {})
+  
+  let frequentContactObj = validTransactions.reduce((fc, {to}) => {
+    if(fc.hasOwnProperty(to)){
+      fc[to] += 1;
+    }else{
+      fc[to] = 1;
+    }
+    return fc;
+  }, {})
+  let sortedEntriesOfFreq = Object.entries(frequentContactObj).sort((a,b) => b[1] - a[1]);
+  let frequantContact = sortedEntriesOfFreq[0][0];
+
+  // all above 100 
+  let allAbove100 = validTransactions.every((t) => t.amount > 100);
+  let hasLargestTransaction = validTransactions.some(({amount}) => amount> 500);
+
+  return { totalCredit: totalCredit, totalDebit: totalDebit, netBalance: netBalance, transactionCount: transactionCount, avgTransaction: avgTransactions, highestTransaction: highestTransaction, categoryBreakdown: categoryTransaction, frequentContact: frequantContact, allAbove100: allAbove100, hasLargeTransaction: hasLargestTransaction }
+
+
+  
 }

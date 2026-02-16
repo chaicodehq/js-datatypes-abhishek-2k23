@@ -90,7 +90,6 @@ export function processRailwayPNR(pnrData) {
     else if (p.current.startsWith("WL")) statusLabel = "WAITING";
     else if (p.current.startsWith("RAC")) statusLabel = "RAC";
     else statusLabel = "CONFIRMED";
-
     return {
       formattedName: p.name.padEnd(20) + `(${p.age}/${p.gender})`,
       bookingStatus: p.booking,
